@@ -1,0 +1,17 @@
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+# Python
+venvDevin/
+__pycache__/
+*.pyc
+
+# Configuración de usuario de VS Code (opcional, pero recomendado)
+.vscode/
+# Pruebas experimentales
+tests/
