@@ -32,14 +32,19 @@ if [[ -n "${BANCATLAN_VPN_PASSWORD:-}" ]]; then
   # Feed only the first password via stdin. Any additional prompts
   # (MFA token, secondary password) will block waiting for interactive input,
   # which is exactly what we want: no MFA automation.
+  #
+  # --useragent: Spoof AnyConnect client version to prevent
+  #              "Please upgrade your AnyConnect Client" rejection.
   printf '%s\n' "${BANCATLAN_VPN_PASSWORD}" | sudo -E openconnect \
     --protocol="${VPN_PROTOCOL}" \
     --user="${USER_NAME}" \
+    --useragent="AnyConnect Linux_64 4.10.07061" \
     --passwd-on-stdin \
     "${VPN_HOST}"
 else
   sudo -E openconnect \
     --protocol="${VPN_PROTOCOL}" \
     --user="${USER_NAME}" \
+    --useragent="AnyConnect Linux_64 4.10.07061" \
     "${VPN_HOST}"
 fi
