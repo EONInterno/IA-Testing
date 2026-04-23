@@ -19,7 +19,7 @@
 set -euo pipefail
 
 SAP_HOST="10.165.6.8"
-SAP_PORT="443"
+SAP_PORT="44300"  # SAP Fiori ICM HTTPS port (not 443)
 TMP_CERT="/tmp/bancatlan-ca.pem"
 TRUST_STORE_DIR="/usr/local/share/ca-certificates"
 TRUST_STORE_FILE="${TRUST_STORE_DIR}/bancatlan-ca.crt"
