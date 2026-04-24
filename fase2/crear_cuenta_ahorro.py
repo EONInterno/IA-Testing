@@ -313,7 +313,10 @@ def main():
             numero_cuenta = crear_cuenta_ahorro(page, params)
         except Exception as exc:
             print(f"\n[ERROR] Error durante la creación: {exc}")
-            screenshot(page, "error_creacion")
+            try:
+                screenshot(page, "error_creacion")
+            except Exception:
+                print("[ERROR] No se pudo capturar screenshot de error")
             import traceback
             traceback.print_exc()
             numero_cuenta = "ERROR"
