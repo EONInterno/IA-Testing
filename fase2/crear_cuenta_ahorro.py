@@ -64,7 +64,7 @@ def seleccionar_fecha(page, fecha_str: str):
     """Selecciona la fecha de inicio en el date picker de SAP."""
     fecha_obj = datetime.strptime(fecha_str, "%d/%m/%Y")
     anio = fecha_obj.year
-    nombre_mes = fecha_obj.strftime("%B")
+    nombre_mes = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][fecha_obj.month]
     fecha_sap = fecha_obj.strftime("%Y%m%d")
 
     print(f"  [Fecha] Seleccionando {fecha_str}...")
@@ -188,7 +188,7 @@ def crear_cuenta_ahorro(page, params: dict) -> str:
 
     # --- Paso 9: Llenar Contract Purpose (CONDICION_GRUPO del usuario) ---
     print(f"[Paso 9] Ingresando Contract Purpose: {condicion_grupo}")
-    purpose_field = page.locator("input").filter(has=page.locator("[id*='contractPurpose']")).first
+    purpose_field = page.locator("input[id*='contractPurpose']").first
     if purpose_field.count() == 0:
         purpose_field = page.get_by_role("textbox").nth(0)
     purpose_field.click()
