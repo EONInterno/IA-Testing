@@ -75,16 +75,46 @@ def _connect_cisco(host: str, user: str, password: str) -> bool:
         return False
 
 
+def _get_server_cert(host: str) -> str:
+    """Obtain the server certificate fingerprint by attempting a connection."""
+    try:
+        result = subprocess.run(
+            ["sudo", "openconnect", "--user=probe", "--passwd-on-stdin",
+             "--authenticate", host],
+            input="\n", capture_output=True, text=True, timeout=15,
+        )
+        output = result.stdout + "\n" + result.stderr
+        for line in output.splitlines():
+            if "pin-sha256:" in line:
+                for part in line.split():
+                    if part.startswith("pin-sha256:"):
+                        return part
+    except Exception:
+        pass
+    return ""
+
+
 def _connect_openconnect(host: str, user: str, password: str) -> bool:
     print(f"[VPN] Conectando con openconnect a {host}...")
+
+    # Get server certificate fingerprint
+    cert_pin = _get_server_cert(host)
+    if not cert_pin:
+        cert_pin = "pin-sha256:zU6fsdqNW3Zte2VzOIpfFEeU4P1HzsSq4NuK5bbAr9Y="
+        print(f"[VPN] Usando cert pin predeterminado: {cert_pin}")
+    else:
+        print(f"[VPN] Cert pin detectado: {cert_pin}")
+
     try:
         proc = subprocess.Popen(
             [
                 "sudo", "openconnect",
                 "--user", user,
                 "--passwd-on-stdin",
-                "--no-dtls",
-                "--servercert", "pin-sha256:ACCEPT",
+                "--servercert", cert_pin,
+                "--useragent", "AnyConnect Windows 4.10.05111",
+                "--version-string", "4.10.05111",
+                "--protocol", "anyconnect",
                 host,
             ],
             stdin=subprocess.PIPE,
