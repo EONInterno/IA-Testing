@@ -106,6 +106,7 @@ def _connect_openconnect(host: str, user: str, password: str) -> bool:
         print(f"[VPN] Cert pin detectado: {cert_pin}")
 
     log_path = EVIDENCE_DIR / "vpn_openconnect.log"
+    log_file = None
     try:
         log_file = open(log_path, "w")
         proc = subprocess.Popen(
@@ -134,6 +135,7 @@ def _connect_openconnect(host: str, user: str, password: str) -> bool:
         # Check if process is still running (good sign for VPN)
         if proc.poll() is not None:
             log_file.close()
+            log_file = None
             log = log_path.read_text()
             _save_connection_log(log)
             print(f"[VPN] openconnect terminó inesperadamente:\n{log}")
@@ -144,6 +146,9 @@ def _connect_openconnect(host: str, user: str, password: str) -> bool:
     except Exception as exc:
         print(f"[VPN] Error con openconnect: {exc}")
         return False
+    finally:
+        if log_file is not None:
+            log_file.close()
 
 
 def _verify_connection(host: str) -> bool:
