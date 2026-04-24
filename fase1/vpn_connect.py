@@ -105,7 +105,9 @@ def _connect_openconnect(host: str, user: str, password: str) -> bool:
     else:
         print(f"[VPN] Cert pin detectado: {cert_pin}")
 
+    log_path = EVIDENCE_DIR / "vpn_openconnect.log"
     try:
+        log_file = open(log_path, "w")
         proc = subprocess.Popen(
             [
                 "sudo", "openconnect",
@@ -118,8 +120,8 @@ def _connect_openconnect(host: str, user: str, password: str) -> bool:
                 host,
             ],
             stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stdout=log_file,
+            stderr=log_file,
             text=True,
         )
         # Send password and leave the process running in background
@@ -131,8 +133,8 @@ def _connect_openconnect(host: str, user: str, password: str) -> bool:
 
         # Check if process is still running (good sign for VPN)
         if proc.poll() is not None:
-            stdout, stderr = proc.communicate()
-            log = stdout + "\n" + stderr
+            log_file.close()
+            log = log_path.read_text()
             _save_connection_log(log)
             print(f"[VPN] openconnect terminó inesperadamente:\n{log}")
             return False

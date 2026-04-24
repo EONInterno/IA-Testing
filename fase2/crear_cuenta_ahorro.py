@@ -89,6 +89,8 @@ def seleccionar_fecha(page, fecha_str: str):
         else:
             page.locator("#CACStartDateCalendar--Head-next").click()
         page.wait_for_timeout(500)
+    else:
+        raise Exception(f"No se encontró el año {anio} en el date picker después de {max_clicks} intentos.")
 
     # Seleccionar mes
     page.locator("#CACStartDateCalendar--Head-B1").click()
