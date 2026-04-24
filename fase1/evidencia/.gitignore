@@ -1,0 +1,8 @@
+# No commitear archivos de evidencia
+*.png
+*.webm
+*.mp4
+*.txt
+*.log
+!.gitkeep
+!.gitignore
