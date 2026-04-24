@@ -54,25 +54,39 @@ def connect_vpn(host: str, user: str, password: str) -> bool:
 def _connect_cisco(host: str, user: str, password: str) -> bool:
     print(f"[VPN] Conectando con Cisco AnyConnect a {host}...")
     input_data = f"connect {host}\n{user}\n{password}\ny\n"
+    log_path = EVIDENCE_DIR / "vpn_cisco.log"
+    log_file = None
     try:
+        log_file = open(log_path, "w")
         proc = subprocess.Popen(
             [CISCO_BIN, "-s"],
             stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stdout=log_file,
+            stderr=log_file,
             text=True,
         )
-        stdout, stderr = proc.communicate(input=input_data, timeout=60)
-        log = stdout + "\n" + stderr
-        _save_connection_log(log)
+        proc.stdin.write(input_data)
+        proc.stdin.flush()
 
         print("Credenciales VPN enviadas. Por favor aprueba el MFA en tu dispositivo.")
         time.sleep(30)
 
+        if proc.poll() is not None:
+            log_file.close()
+            log_file = None
+            log = log_path.read_text()
+            _save_connection_log(log)
+            print(f"[VPN] Cisco AnyConnect terminó inesperadamente:\n{log}")
+            return False
+
+        _save_connection_log("[VPN] Cisco AnyConnect corriendo en segundo plano.")
         return _verify_connection(host)
     except Exception as exc:
         print(f"[VPN] Error con Cisco AnyConnect: {exc}")
         return False
+    finally:
+        if log_file is not None:
+            log_file.close()
 
 
 def _get_server_cert(host: str) -> str:
