@@ -3,9 +3,7 @@ Fase 1 — Login a SAP Fiori con Playwright (síncrono)
 Navega al launchpad de SAP Fiori, ingresa credenciales y verifica acceso al Shell Home.
 """
 
-import os
 from pathlib import Path
-from datetime import datetime
 from playwright.sync_api import sync_playwright, TimeoutError as PwTimeout
 
 SAP_URL = "https://10.165.6.8:44300/sap/bc/ui2/flp?sap-client=110&sap-language=EN#Shell-home"
@@ -106,7 +104,10 @@ def login_sap(sap_user: str, sap_password: str) -> bool:
             success = _perform_login(page, sap_user, sap_password)
         except Exception as exc:
             print(f"[SAP] Error durante login: {exc}")
-            page.screenshot(path=str(SCREENSHOTS_DIR / "error_sap_login.png"))
+            try:
+                page.screenshot(path=str(SCREENSHOTS_DIR / "error_sap_login.png"))
+            except Exception:
+                print("[SAP] No se pudo capturar screenshot de error")
             success = False
         finally:
             context.close()

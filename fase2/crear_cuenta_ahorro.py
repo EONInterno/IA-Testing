@@ -4,8 +4,10 @@ Conecta al Chrome del escritorio vía CDP, navega por SAP Fiori y crea una cuent
 Los parámetros se solicitan por consola (no hardcodeados).
 """
 
+import os
 import sys
 import time
+import traceback
 from datetime import datetime
 from pathlib import Path
 from playwright.sync_api import sync_playwright, TimeoutError as PwTimeout
@@ -19,8 +21,11 @@ def screenshot(page, name: str):
     """Toma screenshot y lo guarda con nombre descriptivo."""
     SCREENSHOTS_DIR.mkdir(parents=True, exist_ok=True)
     path = SCREENSHOTS_DIR / f"{name}.png"
-    page.screenshot(path=str(path))
-    print(f"  [Screenshot] {path.name}")
+    try:
+        page.screenshot(path=str(path))
+        print(f"  [Screenshot] {path.name}")
+    except Exception:
+        print(f"  [Screenshot] No se pudo capturar {path.name}")
 
 
 def solicitar_parametros() -> dict:
@@ -293,7 +298,6 @@ def main():
             print("[OK] Sesión SAP activa — Shell Home visible")
         except PwTimeout:
             print("[Login] Necesita login. Ingresando credenciales...")
-            import os
             sap_user = os.environ.get("SAP_USER", "")
             sap_password = os.environ.get("SAP_PASSWORD", "")
             if sap_user and sap_password:
@@ -317,7 +321,6 @@ def main():
                 screenshot(page, "error_creacion")
             except Exception:
                 print("[ERROR] No se pudo capturar screenshot de error")
-            import traceback
             traceback.print_exc()
             numero_cuenta = "ERROR"
 

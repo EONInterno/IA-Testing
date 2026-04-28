@@ -3,7 +3,6 @@ Fase 1 — Conexión VPN Cisco AnyConnect / openconnect
 Conecta a la VPN corporativa y verifica acceso a la red SAP.
 """
 
-import os
 import subprocess
 import shutil
 import time
@@ -19,7 +18,7 @@ def _ensure_evidence_dir():
 
 
 def _cisco_available() -> bool:
-    return shutil.which(CISCO_BIN) is not None or Path(CISCO_BIN).exists()
+    return shutil.which(CISCO_BIN) is not None or Path(CISCO_BIN).is_file()
 
 
 def _install_openconnect():
@@ -177,7 +176,7 @@ def _verify_connection(host: str) -> bool:
              f"https://{target}:44300/"],
             capture_output=True, text=True, timeout=15,
         )
-        if result.returncode == 0 or "SSL" in result.stderr or "html" in result.stdout.lower():
+        if result.returncode == 0 or "SSL" in (result.stderr or "") or "html" in (result.stdout or "").lower():
             print(f"[VPN] ✓ Conexión exitosa a {target}")
             _save_evidence_screenshot(True, target)
             return True
